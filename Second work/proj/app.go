@@ -15,6 +15,7 @@ import (
 
 var (
 	dir         = flag.String("d", "", "Use a directory path to iterate through all included CSV files.")
+	input       = flag.String("i", "", "Use a file with the name file-name as an input.")
 	output      = flag.String("o", "", "Use a file with the name file-name as an output.")
 	fieldSort   = flag.Int("f", 0, "Sort input lines by value number N.")
 	reverseSort = flag.Bool("r", false, "Sort input lines in reverse order.")
@@ -28,13 +29,21 @@ func main() {
 	fmt.Println("-----STARTED-----")
 	flag.Parse()
 
+	if *dir != "" && *input != "" {
+		log.Fatal("ERROR: You can't use -d and -i options at the same time!")
+	}
+
 	// Parsing current Dir or selected Dir
 	if *dir == "" {
-		currentDirectory, err := os.Getwd()
-		if err != nil {
-			log.Fatal(err)
+		if *input != "" {
+			files = findFiles(*input)
+		} else {
+			currentDirectory, err := os.Getwd()
+			if err != nil {
+				log.Fatal(err)
+			}
+			files = findFiles(currentDirectory)
 		}
-		files = findFiles(currentDirectory)
 	} else {
 		files = findFiles(*dir)
 	}
@@ -130,7 +139,7 @@ func readFile(fileName string, fieldsChan chan []string) {
 	if openErr != nil {
 		log.Fatal(openErr)
 	}
-
+	fmt.Println("READFILE")
 	s := bufio.NewScanner(readFile)
 	s.Split(bufio.ScanLines)
 
