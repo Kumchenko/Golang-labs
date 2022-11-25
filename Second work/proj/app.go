@@ -139,7 +139,6 @@ func readFile(fileName string, fieldsChan chan []string) {
 	if openErr != nil {
 		log.Fatal(openErr)
 	}
-	fmt.Println("READFILE")
 	s := bufio.NewScanner(readFile)
 	s.Split(bufio.ScanLines)
 
